@@ -10,9 +10,11 @@ import {
     removeLike
 } from '../controllers/creator.controller';
 
+import { validateRequiredData } from "../handlers/creator.handler";
+
 const creatorRouter: Router = Router();
 
-creatorRouter.post('/signup', httpSignup);
+creatorRouter.post('/signup', validateRequiredData, httpSignup);
 creatorRouter.get('/profile', creatorById);
 creatorRouter.put('/editProfile', editProfile);
 creatorRouter.put('/follow', followCreator);
