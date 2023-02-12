@@ -1,9 +1,10 @@
 export interface Creator {
-    id: number;
+    id?: number;
     name: string;
     lastname: string;
     email: string;
     pass: string;
     photo: string;
     followers?: number;
+    rol_id: number
 }

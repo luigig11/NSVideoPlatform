@@ -20,7 +20,7 @@ const server = createServer(app);
 
 async function startServer(): Promise<void> {
     try {
-        await sequelizeConnection.sync({alter: isDevEnv});
+        // await sequelizeConnection.sync({alter: isDevEnv});
         console.log('Connection has been established successfully.');
         server.listen(PORT, () => {
             console.log('Project int in port ', PORT);

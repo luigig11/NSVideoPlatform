@@ -41,7 +41,7 @@ Video.init({
     },
     creation_date: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true //cambiar esto a false y agregar un valor por default del timestamp actual
     },
     is_deleted: {
         type: DataTypes.BOOLEAN,
