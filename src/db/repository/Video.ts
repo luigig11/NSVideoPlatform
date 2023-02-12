@@ -1,4 +1,4 @@
-/* import { Sequelize, DataTypes, Model } from "sequelize";
+import { Sequelize, DataTypes, Model } from "sequelize";
 import {sequelizeConnection} from '../config';
 
 class Video extends Model {};
@@ -14,7 +14,7 @@ Video.init({
         type: DataTypes.STRING,
         allowNull: false
     },
-    decription: {
+    description: {
         type: DataTypes.STRING,
         allowNull: true
     },
@@ -35,7 +35,11 @@ Video.init({
         type: DataTypes.BIGINT,
         allowNull: true
     },
-    date_post: {
+    date_published: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    creation_date: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -48,10 +52,10 @@ Video.init({
 }, {
     sequelize: sequelizeConnection,
     modelName: 'Video',
-    tableName: 'video'
+    tableName: 'video',
+    timestamps: false
 });
 
 export default Video;
 
 
- */

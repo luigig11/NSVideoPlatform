@@ -1,4 +1,4 @@
-/* import { Sequelize, DataTypes, Model } from "sequelize";
+import { Sequelize, DataTypes, Model } from "sequelize";
 import {sequelizeConnection} from '../config';
 import Creator from "./Creator";
 import Video from "./Video";
@@ -12,20 +12,6 @@ LikeVideo.init({
         autoIncrement: true,
         allowNull: false
     },
-    creator_id: {
-        type: DataTypes.BIGINT,
-        references: {
-            model: Creator,
-            key: 'creator_id'
-        }
-    },
-    video_id: {
-        type: DataTypes.BIGINT,
-        references: {
-            model: Video,
-            key: 'video_id'
-        }
-    },
     is_liked: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
@@ -34,10 +20,11 @@ LikeVideo.init({
 }, {
     sequelize: sequelizeConnection,
     modelName: 'LikeVideo',
-    tableName: 'like_video'
+    tableName: 'like_video',
+    timestamps: false
 });
- */
-/* Creator.belongsToMany(Video, {through: LikeVideo});
-Video.belongsToMany(Creator, {through: LikeVideo}); */
 
-/* export default LikeVideo; */
+Creator.belongsToMany(Video, {through: LikeVideo, foreignKey: 'creator_id'});
+Video.belongsToMany(Creator, {through: LikeVideo, foreignKey: 'video_id'});
+
+export default LikeVideo;

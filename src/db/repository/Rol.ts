@@ -1,7 +1,8 @@
-import { /* Sequelize,  */DataTypes, Model } from "sequelize";
-import {sequelizeConnection} from '../config';/* 
+import { DataTypes, Model } from "sequelize";
+import {sequelizeConnection} from '../config';
+
 import Creator from "./Creator";
- */
+
 class Rol extends Model {};
 
 Rol.init({
@@ -23,7 +24,7 @@ Rol.init({
     timestamps: false
 });
 
-/* Rol.hasOne(Creator, {
+Rol.hasOne(Creator, {
     foreignKey: 'rol_id',
     sourceKey: 'rol_id'
 });
@@ -31,6 +32,6 @@ Rol.init({
 Creator.belongsTo(Rol, {
     foreignKey: 'rol_id',
     targetKey: 'rol_id'
-}); */
+});
 
 export default Rol;

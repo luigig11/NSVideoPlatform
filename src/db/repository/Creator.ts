@@ -1,4 +1,4 @@
-/* import { Sequelize, DataTypes, Model } from "sequelize";
+import { Sequelize, DataTypes, Model } from "sequelize";
 import {sequelizeConnection} from '../config';
 import Video from "./Video";
 
@@ -40,12 +40,13 @@ Creator.init({
 }, {
     sequelize: sequelizeConnection,
     modelName: 'Creator',
-    tableName: 'creator'
-}); */
+    tableName: 'creator',
+    timestamps: false
+});
 
 //Associations
 
-/* Creator.hasMany(Video, {
+Creator.hasMany(Video, {
     foreignKey: 'creator_id',
     sourceKey: 'creator_id'
 });
@@ -53,6 +54,6 @@ Creator.init({
 Video.belongsTo(Creator, {
     foreignKey: 'creator_id',
     targetKey: 'creator_id'
-}); */
+});
 
-/* export default Creator; */
+export default Creator;

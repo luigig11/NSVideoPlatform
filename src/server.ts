@@ -7,10 +7,10 @@ dotenv.config();
 import app from './app';
 
 //DB models
-/* import { Rol } from './db/repository/Rol';
-import {Creator} from './db/repository/Creator';
-import {Video} from './db/repository/Video';
-import {LikeVideo} from './db/repository/LikeVideo'; */
+import './db/repository/Rol';
+import './db/repository/Creator';
+import './db/repository/Video';
+import './db/repository/LikeVideo';
 
 const isDevEnv = process.env.NODE_ENV === 'development';
 
