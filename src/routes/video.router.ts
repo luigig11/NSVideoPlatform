@@ -1,17 +1,19 @@
 import { Router } from "express";
 
+
 import { 
-    createVideo,
+    httpCreateVideo,
     getVideoById,
     publishVideo,
     hideVideo,
     editVideo,
     getVideos
 } from '../controllers/video.controller';
+import { validateRequiredData } from "../handlers/video.handler";
 
 const videoRouter: Router = Router();
 
-videoRouter.post('/create', createVideo);
+videoRouter.post('/create', validateRequiredData,  httpCreateVideo);
 videoRouter.get('/video', getVideoById);
 videoRouter.put('/publish', publishVideo);
 videoRouter.put('/unpublish', hideVideo);

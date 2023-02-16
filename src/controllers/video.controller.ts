@@ -1,6 +1,14 @@
+import { Request, Response } from "express";
+import { create } from "../handlers/video.handler";
+import { Error, Sucess } from "../network/response";
 
-function createVideo() {
-    
+async function httpCreateVideo(req: Request, res: Response) {
+    try {
+        const newVideo = await create(req.body);
+        return Sucess(req, res, newVideo, 200)
+    } catch (error) {
+        return Error(req, res, error);
+    }
 }
 
 function getVideoById() {
@@ -24,7 +32,7 @@ function getVideos() {
 }
 
 export {
-    createVideo,
+    httpCreateVideo,
     getVideoById,
     publishVideo,
     hideVideo,

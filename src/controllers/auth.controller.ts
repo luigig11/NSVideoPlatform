@@ -22,17 +22,8 @@ function httpSignout(req: Request, res: Response) {
     }
 }
 
-function requireSingin() {
-    
-}
-
-function hasAuthorization() {
-    
-}
 
 export {
     httpSignin,
-    httpSignout,
-    requireSingin,
-    hasAuthorization
+    httpSignout
 }

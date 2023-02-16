@@ -1,6 +1,6 @@
 import DBCreator from '../db/repository/Creator';
 import { sequelizeConnection } from "../db/config";
-import { Creator } from "../models/creator";
+import { Creator, QueryParametrs } from "../models/creator";
 import {encrypt} from '../helpers/crypto'
 import { NextFunction, Request, Response } from 'express';
 import { Error as NetworkError } from '../network/response';
@@ -28,7 +28,7 @@ function validateRequiredData(req: Request, res: Response, next: NextFunction) {
 async function create(newCreator: Creator): Promise<Creator> {
 
     //validate if the creator already exists in DB
-    const existingCreator = await getCreator(newCreator.email);
+    const existingCreator = await getCreator({email: newCreator.email} as QueryParametrs);
     if (existingCreator) {
         throw new Error('already existing creator');
     }
@@ -60,11 +60,24 @@ async function create(newCreator: Creator): Promise<Creator> {
     }
 }
 
-async function getCreator(email: string) {
+async function getCreator(query: QueryParametrs) {
     try {
+
+        let queryParameter = ''
+        let value;
+
+        if (query.id) {
+            queryParameter = 'creator_id';
+            value = query.id;
+        }
+        else {
+            queryParameter = 'email';
+            value = query.email;
+        }
+
         let registeredCreator = await DBCreator.findOne({
             where: {
-                email: email
+                [queryParameter]: value
             }
         });
         if (!registeredCreator) {

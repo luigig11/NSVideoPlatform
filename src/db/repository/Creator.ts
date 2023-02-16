@@ -1,7 +1,6 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
 import {sequelizeConnection} from '../config';
 import Video from "./Video";
-import {Creator as CreatorModel} from '../../models/creator'
 
 class Creator extends Model {};
 

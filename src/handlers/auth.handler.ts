@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { decrypt } from "../helpers/crypto";
 import { Creator } from "../models/creator";
-import { getCreator } from "./creator.handler"
+import { getCreator } from "./creator.handler";
+import { expressjwt } from "express-jwt";
 import jwt, { Jwt } from 'jsonwebtoken';
 import { Error as NetworkError } from '../network/response';
 
@@ -33,7 +34,7 @@ async function signIn(email: string, password: string) {
     try {
 
         //autenticating user
-        let creator: Creator = await getCreator(email);
+        let creator: Creator = await getCreator({email});
         if (!creator) throw new Error('Creator does not exist');
         const authenticate = await decrypt(password, creator.pass);
         if ( !authenticate) throw new Error("Email and password don't match");
@@ -53,7 +54,29 @@ async function signIn(email: string, password: string) {
     }
 }
 
+//TODO: Authorization and authentication
+const requireSignin = expressjwt({
+    secret: process.env.JWT_SECRET!,
+    requestProperty: 'auth',
+    algorithms: ['RS256', 'HS256']
+});
+
+function hasAuthorization(req: any, res: Response, next: NextFunction) {
+    const authorized = req.profile && req.auth && req.profile._id == req.auth._id; //Aquí se hace solo la comparacion por valor porque req.profile._id y req.auth._id no son del mismo tipo
+    console.log(req.profile)
+    console.log(req.auth)
+    console.log(req.profile._id)
+    console.log(req.auth._id)
+    if (!(authorized)) {
+        return NetworkError(req, res, 'User is not authorized', 'User is not authorized', '403')
+    }
+    next();
+}
+
 export {
     signIn,
-    validateRequiredData
+    validateRequiredData,
+    createtoken,
+    requireSignin,
+    hasAuthorization
 }
