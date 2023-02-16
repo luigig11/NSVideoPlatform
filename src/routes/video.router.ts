@@ -4,8 +4,8 @@ import { Router } from "express";
 import { 
     httpCreateVideo,
     getVideoById,
-    publishVideo,
-    hideVideo,
+    httpUnPublishVideo,
+    httpPublishVideo,
     editVideo,
     getVideos
 } from '../controllers/video.controller';
@@ -15,8 +15,8 @@ const videoRouter: Router = Router();
 
 videoRouter.post('/create', validateRequiredData,  httpCreateVideo);
 videoRouter.get('/video', getVideoById);
-videoRouter.put('/publish', publishVideo);
-videoRouter.put('/unpublish', hideVideo);
+videoRouter.put('/publish', httpPublishVideo);
+videoRouter.put('/unpublish', httpUnPublishVideo);
 videoRouter.put('/edit', editVideo);
 videoRouter.get('/listvideo', getVideos);
 

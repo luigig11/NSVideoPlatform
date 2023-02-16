@@ -15,11 +15,15 @@ function getVideoById() {
     
 }
 
-function publishVideo() {
-    
+function httpPublishVideo() {
+    try {
+        
+    } catch (error) {
+        
+    }
 }
 
-function hideVideo() {
+function httpUnPublishVideo() {
     
 }
 
@@ -34,8 +38,8 @@ function getVideos() {
 export {
     httpCreateVideo,
     getVideoById,
-    publishVideo,
-    hideVideo,
+    httpPublishVideo,
+    httpUnPublishVideo,
     editVideo,
     getVideos
 }
