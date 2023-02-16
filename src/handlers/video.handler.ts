@@ -50,18 +50,12 @@ async function create(video: Video) {
 async function getVideo(query: QueryParametrs) {
     //select limit = parameter * from videos where creator_id = <parameter> and creator
     try {
-
-        const queryParameter = query.creator_id ? 'creator_id' : 'video_id';
-        const value = (queryParameter === 'creator_id') ? query.creator_id : query.video_id;
-
         let video = await DBVideo.findOne({
             where: {
-                [queryParameter]: value
+                video_id: query.video_id
             }
         });
-        if (!video) {
-            return null;
-        }
+        if (!video) throw new Error('Could not find video');
         return video.toJSON<Video>();
     } catch (error) {
         console.log('Error while looking for vido: ', error);
@@ -99,24 +93,23 @@ async function getAllVideos(query: QueryParametrs) {
 }
 
 async function getPublishedVideos(query: QueryParametrs) {
-    const queryParameter = query.creator_id ? 'creator_id' : 'video_id';
+    /* const queryParameter = query.creator_id ? 'creator_id' : 'video_id';
     const value = (queryParameter === 'creator_id') ? query.creator_id : query.video_id;
-    const orderItem = query.orderParameter || 'video_id';
+     */const orderItem = query.orderParameter || 'video_id';
     const orderList = query.listOrder || 'DESC';
     try {
         let videos = await DBVideo.findAll({
             where: {
-                [queryParameter]: value,
                 published: query.published
             },
             limit: parseInt(query.limit!),
             offset: parseInt(query.page!),
             order: [
-                orderItem, orderList
+                [orderItem, orderList]
             ]
         });
         if (!videos) {
-            return null;
+            return [];
         }
         let listVideo: Video[] = videos.map(video => video.toJSON());
         return listVideo;
@@ -130,19 +123,17 @@ async function getLikedVideos(query: QueryParametrs) {
     const orderItem = query.orderParameter || 'video_id';
     const orderList = query.listOrder || 'DESC';
     try {
-
+        //TODO: MEMOIZE THIS LIST
         let creator_video = await DBLikeVideo.findAll({
             where: {
                 creator_id: query.creator_id
             },
-            limit: parseInt(query.limit!),
-            offset: parseInt(query.page!),
             order: [
                 [orderItem, orderList]
             ]
         });
 
-        if (!creator_video) return null;
+        if (!creator_video) return [];
 
         let videoId = creator_video.map(video => {
             return video.getDataValue('video_id');
@@ -159,7 +150,7 @@ async function getLikedVideos(query: QueryParametrs) {
             ]
         });
 
-        if (!likedvideos) return null;
+        if (!likedvideos) return [];
 
         let listVideo: Video[] = likedvideos.map(video => video.toJSON());
         return listVideo;
@@ -169,11 +160,57 @@ async function getLikedVideos(query: QueryParametrs) {
     }
 }
 
+async function publishVideo(query:QueryParametrs) {
+    const video = await getVideo(query);
+    if (!video) throw new Error('video not founded');
+    const t = await sequelizeConnection.transaction();
+    try {        
+        const updatedVideo = DBVideo.update({
+            published: query.published
+        }, {
+            where: {
+                video_id: query.video_id
+            }
+        })
+        await t.commit();
+        return updatedVideo;
+    } catch (error) {
+        await t.rollback();
+        console.log('transaccion error: ', error);
+        throw new Error('The video was not updated');
+    }
+}
+
+async function update(query: Video) {
+    const video = await getVideo(query);
+    if (!video) throw new Error('video not founded');
+    const t = await sequelizeConnection.transaction();
+    try {        
+        const updatedVideo = DBVideo.update({
+            title: query.title,
+            description: query.description,
+            url: query.url,
+        }, {
+            where: {
+                video_id: query.video_id
+            }
+        })
+        await t.commit();
+        return updatedVideo;
+    } catch (error) {
+        await t.rollback();
+        console.log('transaccion error: ', error);
+        throw new Error('The video was not updated');
+    }
+}
+
 export {
     getVideo,
     getAllVideos,
     getPublishedVideos,
     getLikedVideos,
     create,
-    validateRequiredData
+    validateRequiredData,
+    publishVideo,
+    update
 }

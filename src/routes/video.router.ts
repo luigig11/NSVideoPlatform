@@ -3,22 +3,25 @@ import { Router } from "express";
 
 import { 
     httpCreateVideo,
-    getVideoById,
     httpUnPublishVideo,
     httpPublishVideo,
-    editVideo,
-    getVideos
+    httpEditVideo,
+    httpGetVideos,
+    httpGetLikedVideos,
+    httpGetVideo
 } from '../controllers/video.controller';
+
 import { validateRequiredData } from "../handlers/video.handler";
 
 const videoRouter: Router = Router();
 
+videoRouter.get('/', httpGetVideo);
 videoRouter.post('/create', validateRequiredData,  httpCreateVideo);
-videoRouter.get('/video', getVideoById);
 videoRouter.put('/publish', httpPublishVideo);
 videoRouter.put('/unpublish', httpUnPublishVideo);
-videoRouter.put('/edit', editVideo);
-videoRouter.get('/listvideo', getVideos);
+videoRouter.put('/edit', httpEditVideo);
+videoRouter.get('/listvideos', httpGetVideos);
+videoRouter.get('/likevideos', httpGetLikedVideos);
 
 
 export {
