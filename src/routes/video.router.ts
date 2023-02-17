@@ -16,13 +16,12 @@ import { validateRequiredData } from "../handlers/video.handler";
 const videoRouter: Router = Router();
 
 videoRouter.get('/', httpGetVideo);
+videoRouter.get('/listvideos', httpGetVideos);
+videoRouter.get('/likevideos', httpGetLikedVideos);
 videoRouter.post('/create', validateRequiredData,  httpCreateVideo);
 videoRouter.put('/publish', httpPublishVideo);
 videoRouter.put('/unpublish', httpUnPublishVideo);
 videoRouter.put('/edit', httpEditVideo);
-videoRouter.get('/listvideos', httpGetVideos);
-videoRouter.get('/likevideos', httpGetLikedVideos);
-
 
 export {
     videoRouter

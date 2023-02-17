@@ -3,70 +3,78 @@ import { create, publishVideo, getPublishedVideos, getLikedVideos, getVideo, upd
 import { Video } from "../models/video";
 import { Error, Sucess } from "../network/response";
 
-async function httpCreateVideo(req: Request, res: Response) {
+//#region Get methods
+async function httpGetVideo(req: Request, res: Response): Promise<void> {
     try {
-        const newVideo: Video = await create(req.body);
+        const newVideo: Video | null = await getVideo(req.query);
+        if (!newVideo) return Error(req, res, 'could not find video')
         return Sucess(req, res, newVideo, 200)
     } catch (error) {
         return Error(req, res, error);
     }
 }
-
-async function httpGetVideo(req: Request, res: Response) {
+async function httpGetVideos(req: Request, res: Response): Promise<void> {
     try {
-        const newVideo = await getVideo(req.query);
-        return Sucess(req, res, newVideo, 200)
-    } catch (error) {
-        return Error(req, res, error);
-    }
-}
-
-async function httpPublishVideo(req: Request, res: Response) {
-    try {
-        const {video_id, published} = req.body;
-        const updatedVideo = await publishVideo({video_id, published});
-        return Sucess(req, res, `${updatedVideo.length} videos published`, 200);
-    } catch (error) {
-        return Error(req, res, error);
-    }
-}
-
-async function httpUnPublishVideo(req: Request, res: Response) {
-    try {
-        const {video_id, published} = req.body;
-        const updatedVideo = await publishVideo({video_id, published});
-        return Sucess(req, res, `${updatedVideo.length} videos unpublished` , 200);
-    } catch (error) {
-        return Error(req, res, error);
-    }
-}
-
-async function httpEditVideo(req: Request, res: Response) {
-    try {
-        const editedVideo = await update(req.body);
-        return Sucess(req, res, editedVideo , 200);
-    } catch (error) {
-        return Error(req, res, error);
-    }
-}
-
-async function httpGetVideos(req: Request, res: Response) {
-    try {
-        const publishedVideos = await getPublishedVideos(req.query);
+        const publishedVideos: Video[] = await getPublishedVideos(req.query);
         return Sucess(req, res, publishedVideos , 200);
     } catch (error) {
         return Error(req, res, error);
     }
 }
 
-async function httpGetLikedVideos(req: Request, res: Response) {
+async function httpGetLikedVideos(req: Request, res: Response): Promise<void> {
     try {
-        const likedVideos = await getLikedVideos(req.query);
+        const likedVideos: Video[] = await getLikedVideos(req.query);
         return Sucess(req, res, likedVideos , 200);
     } catch (error) {
         return Error(req, res, error);
     }
 }
+//#endregion
+
+//#region Post methods
+
+async function httpCreateVideo(req: Request, res: Response): Promise<void> {
+    try {
+        const newVideo: Video = await create(req.body as Video);
+        return Sucess(req, res, newVideo, 200)
+    } catch (error) {
+        return Error(req, res, error);
+    }
+}
+//#endregion
+
+//#region Put methods
+async function httpPublishVideo(req: Request, res: Response): Promise<void> {
+    try {
+        const {video_id, published} = req.body;
+        const updatedVideo: number[] = await publishVideo({video_id, published});
+        return Sucess(req, res, `${updatedVideo.length} videos published`, 200);
+    } catch (error) {
+        return Error(req, res, error);
+    }
+}
+
+async function httpUnPublishVideo(req: Request, res: Response): Promise<void> {
+    try {
+        const {video_id, published} = req.body;
+        const updatedVideo: number[] = await publishVideo({video_id, published});
+        return Sucess(req, res, `${updatedVideo.length} videos unpublished` , 200);
+    } catch (error) {
+        return Error(req, res, error);
+    }
+}
+
+async function httpEditVideo(req: Request, res: Response): Promise<void> {
+    try {
+        const editedVideo: number[] = await update(req.body);
+        return Sucess(req, res, `${editedVideo.length} videos unpublished` , 200);
+    } catch (error) {
+        return Error(req, res, error);
+    }
+}
+
+//#endregion
 
 export {
     httpCreateVideo,

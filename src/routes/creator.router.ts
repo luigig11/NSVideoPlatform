@@ -10,12 +10,12 @@ import {
     removeLike
 } from '../controllers/creator.controller';
 
-import { validateRequiredData } from "../handlers/creator.handler";
+import { getCreator, validateRequiredData } from "../handlers/creator.handler";
 
 const creatorRouter: Router = Router();
 
-creatorRouter.post('/signup', validateRequiredData, httpSignup);
 creatorRouter.get('/profile/:id', httpGetProfile);
+creatorRouter.post('/signup', validateRequiredData, httpSignup);
 creatorRouter.put('/editProfile', editProfile);
 creatorRouter.put('/follow', followCreator);
 creatorRouter.put('/unfollow', unFollowCreator);

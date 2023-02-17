@@ -10,26 +10,12 @@ import { Creator, QueryParametrs as CreatorQueryParameters, Profile } from '../m
 import { Video, QueryParametrs as VideoQueryParameters } from '../models/video';
 import { getAllVideos, getLikedVideos } from '../handlers/video.handler';
 
-async function httpSignup(req: Request, res: Response): Promise<void> {
-    try {
-        const newCreator = await create(req.body);
-        const token = createtoken({
-            id: newCreator.creator_id!,
-            name: newCreator.creator_name,
-            lastname: newCreator.creator_lastname
-        });
-        res.cookie('t', token);
-        return Sucess(req, res, newCreator, 200)
-    } catch (error) {
-        return Error(req, res, error);
-    }
-}
-
+//#region Get methods
 async function httpGetProfile(req: Request, res: Response): Promise<void> {
     
     try {
         //get the creator information
-        const creator: Creator = await getCreator({ id: parseInt(req.params.id) } as CreatorQueryParameters);
+        const creator: Creator | null = await getCreator({ id: parseInt(req.params.id) } as CreatorQueryParameters);
         if (!creator) return Error(req, res, 'Creator not found');
         //get the videos created by the creator
         const videos: Video[] = await getAllVideos(
@@ -56,13 +42,34 @@ async function httpGetProfile(req: Request, res: Response): Promise<void> {
             creator_videos: videos,
             liked_videos: likedVideos
         }
-        return Sucess(req, res, profile, 200)
+        return Sucess(req, res, profile, 200);
     } catch (error) {
         return Error(req, res, error);
     }
 
 }
 
+//#endregion 
+
+//#region Post methods
+
+async function httpSignup(req: Request, res: Response): Promise<void> {
+    try {
+        const newCreator: Creator = await create(req.body as Creator);
+        const token = createtoken({
+            id: newCreator.creator_id!,
+            name: newCreator.creator_name,
+            lastname: newCreator.creator_lastname
+        });
+        res.cookie('t', token);
+        return Sucess(req, res, 'New user created', 200)
+    } catch (error) {
+        return Error(req, res, error);
+    }
+}
+//#endregion
+
+//#region Put methods
 function editProfile() {
 
 }
@@ -74,6 +81,10 @@ function followCreator() {
 function unFollowCreator() {
 
 }
+//#endregion
+
+
+
 
 function addLike() {
 

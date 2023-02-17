@@ -34,7 +34,7 @@ async function signIn(email: string, password: string) {
     try {
 
         //autenticating user
-        let creator: Creator = await getCreator({email});
+        let creator: Creator | null = await getCreator({email});
         if (!creator) throw new Error('Creator does not exist');
         const authenticate = await decrypt(password, creator.pass);
         if ( !authenticate) throw new Error("Email and password don't match");

@@ -7,16 +7,16 @@ import { Error as NetworkError } from '../network/response';
 
 function validateRequiredData(req: Request, res: Response, next: NextFunction) {
     const {
-        name,
-        lastname,
+        creator_name,
+        creator_lastname,
         email,
         pass,
         photo,
         rol_id
-    } = req.body;
+    } = req.body as Creator;
 
-    if (!name) return NetworkError(req, res, 'required name');
-    if (!lastname) return NetworkError(req, res, 'required lastname');
+    if (!creator_name) return NetworkError(req, res, 'required name');
+    if (!creator_lastname) return NetworkError(req, res, 'required lastname');
     if (!email) return NetworkError(req, res, 'required email');
     if (!pass) return NetworkError(req, res, 'required pass');
     if (!photo) return NetworkError(req, res, 'required photo');
@@ -25,10 +25,34 @@ function validateRequiredData(req: Request, res: Response, next: NextFunction) {
     next();
 }
 
+//#region Get methods
+async function getCreator(query: QueryParametrs): Promise<Creator | null> {
+    try {
+
+        let queryParameter = query.id ? 'creator_id' : 'email'
+        let value = (queryParameter === 'creator_id') ? query.id : query.email;
+
+        let registeredCreator = await DBCreator.findOne({
+            where: {
+                [queryParameter]: value
+            }
+        });
+        if (!registeredCreator) return registeredCreator;
+        return registeredCreator.toJSON<Creator>();
+    } catch (error) {
+        console.log('Error while looking for creator: ', error);
+        throw new Error('Could not find creator');
+    }
+        
+}
+//#endregion
+
+//#region Post methods
+
 async function create(newCreator: Creator): Promise<Creator> {
 
     //validate if the creator already exists in DB
-    const existingCreator = await getCreator({email: newCreator.email} as QueryParametrs);
+    const existingCreator: Creator | null = await getCreator({email: newCreator.email} as QueryParametrs);
     if (existingCreator) throw new Error('already existing creator');
 
     //Begin transaction
@@ -58,36 +82,7 @@ async function create(newCreator: Creator): Promise<Creator> {
     }
 }
 
-async function getCreator(query: QueryParametrs) {
-    try {
-
-        let queryParameter = query.id ? 'creator_id' : 'email'
-        let value = (queryParameter === 'creator_id') ? query.id : query.email;
-/* 
-        if (query.id) {
-            queryParameter = 'creator_id';
-            value = query.id;
-        }
-        else {
-            queryParameter = 'email';
-            value = query.email;
-        } */
-
-        let registeredCreator = await DBCreator.findOne({
-            where: {
-                [queryParameter]: value
-            }
-        });
-        if (!registeredCreator) {
-            return null;
-        }
-        return registeredCreator.toJSON();
-    } catch (error) {
-        console.log('Error while looking for creator: ', error);
-        throw new Error('Could not find creator');
-    }
-        
-}
+//#endregion
 
 export {
     create,

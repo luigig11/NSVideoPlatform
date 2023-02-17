@@ -12,7 +12,7 @@ function validateRequiredData(req: Request, res: Response, next: NextFunction) {
         title,
         url,
         creator_id,
-    } = req.body;
+    } = req.body as Video;
 
     if (!title) return NetworkError(req, res, 'required name');
     if (!url) return NetworkError(req, res, 'required lastname');
@@ -20,49 +20,22 @@ function validateRequiredData(req: Request, res: Response, next: NextFunction) {
     next();
 }
 
-async function create(video: Video): Promise<Video> {
-
-    const date_created = new Date().toUTCString();
-    console.log('date_created', date_created);
-
-    //Begin transaction
-    const t = await sequelizeConnection.transaction();
-    try {
-        const newVideo: DBVideo = await DBVideo.create({
-            title: video.title,
-            description: video.description,
-            url: video.url,
-            creation_date: date_created,
-            creator_id: video.creator_id
-        }, { transaction: t });
-
-        console.log('usuario creado: ', newVideo.toJSON());
-        await t.commit();
-        return newVideo.toJSON<Video>();
-
-    } catch (error) {
-        await t.rollback();
-        console.log('transaccion error: ', error);
-        throw new Error('The video was not created');
-    }
-}
-
-async function getVideo(query: QueryParametrs) {
+//#region Select methods
+async function getVideo(query: QueryParametrs): Promise<Video | null> {
     //select limit = parameter * from videos where creator_id = <parameter> and creator
     try {
-        let video = await DBVideo.findOne({
+        let video: DBVideo | null = await DBVideo.findOne({
             where: {
                 video_id: query.video_id
             }
         });
-        if (!video) throw new Error('Could not find video');
+        if (!video) return video;
         return video.toJSON<Video>();
     } catch (error) {
         console.log('Error while looking for vido: ', error);
         throw new Error('Could not find video');
     }
 }
-
 async function getAllVideos(query: QueryParametrs): Promise<Video[]> {
     //select limit = parameter * from videos where creator_id = <parameter> and creator
     const queryParameter = query.creator_id ? 'creator_id' : 'video_id';
@@ -89,11 +62,8 @@ async function getAllVideos(query: QueryParametrs): Promise<Video[]> {
         throw new Error('Could not find videos');
     }
 }
-
-async function getPublishedVideos(query: QueryParametrs) {
-    /* const queryParameter = query.creator_id ? 'creator_id' : 'video_id';
-    const value = (queryParameter === 'creator_id') ? query.creator_id : query.video_id;
-     */const orderItem = query.orderParameter || 'video_id';
+async function getPublishedVideos(query: QueryParametrs): Promise<Video[]> {
+    const orderItem = query.orderParameter || 'video_id';
     const orderList = query.listOrder || 'DESC';
     try {
         let videos = await DBVideo.findAll({
@@ -116,7 +86,6 @@ async function getPublishedVideos(query: QueryParametrs) {
         throw new Error('Could not find videos');
     }
 }
-
 async function getLikedVideos(query: QueryParametrs): Promise<Video[]> {
     const orderItem = query.orderParameter || 'video_id';
     const orderList = query.listOrder || 'DESC';
@@ -157,13 +126,46 @@ async function getLikedVideos(query: QueryParametrs): Promise<Video[]> {
         throw new Error('Could not find videos');
     }
 }
+//#endregion
 
-async function publishVideo(query:QueryParametrs) {
-    const video = await getVideo(query);
+//#region Insert methods
+
+async function create(video: Video): Promise<Video> {
+
+    const date_created = new Date().toUTCString();
+    console.log('date_created', date_created);
+
+    //Begin transaction
+    const t = await sequelizeConnection.transaction();
+    try {
+        const newVideo: DBVideo = await DBVideo.create({
+            title: video.title,
+            description: video.description,
+            url: video.url,
+            creation_date: date_created,
+            creator_id: video.creator_id
+        }, { transaction: t });
+
+        console.log('usuario creado: ', newVideo.toJSON());
+        await t.commit();
+        return newVideo.toJSON<Video>();
+
+    } catch (error) {
+        await t.rollback();
+        console.log('transaccion error: ', error);
+        throw new Error('The video was not created');
+    }
+}
+
+//#endregion
+
+//#region Update methods
+async function publishVideo(query:QueryParametrs): Promise<Array<number>> {
+    const video: Video | null = await getVideo(query);
     if (!video) throw new Error('video not founded');
     const t = await sequelizeConnection.transaction();
     try {        
-        const updatedVideo = DBVideo.update({
+        const updatedVideo: Array<number> = await DBVideo.update({
             published: query.published
         }, {
             where: {
@@ -179,12 +181,12 @@ async function publishVideo(query:QueryParametrs) {
     }
 }
 
-async function update(query: Video) {
-    const video = await getVideo(query);
+async function update(query: Video): Promise<Array<number>> {
+    const video: Video | null = await getVideo(query);
     if (!video) throw new Error('video not founded');
     const t = await sequelizeConnection.transaction();
     try {        
-        const updatedVideo = DBVideo.update({
+        const updatedVideo: number[] = await DBVideo.update({
             title: query.title,
             description: query.description,
             url: query.url,
@@ -201,6 +203,8 @@ async function update(query: Video) {
         throw new Error('The video was not updated');
     }
 }
+
+//#endregion
 
 export {
     getVideo,
