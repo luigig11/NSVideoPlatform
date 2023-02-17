@@ -41,9 +41,9 @@ async function signIn(email: string, password: string) {
 
         //create token
         const Payload = {
-            id: creator.id!,
-            name: creator.name,
-            lastname: creator.lastname
+            id: creator.creator_id!,
+            name: creator.creator_name,
+            lastname: creator.creator_lastname
         }
         const token = createtoken(Payload);
         return token;

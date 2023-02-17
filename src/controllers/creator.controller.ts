@@ -10,13 +10,13 @@ import { Creator, QueryParametrs as CreatorQueryParameters, Profile } from '../m
 import { Video, QueryParametrs as VideoQueryParameters } from '../models/video';
 import { getAllVideos, getLikedVideos } from '../handlers/video.handler';
 
-async function httpSignup(req: Request, res: Response) {
+async function httpSignup(req: Request, res: Response): Promise<void> {
     try {
         const newCreator = await create(req.body);
         const token = createtoken({
-            id: newCreator.id!,
-            name: newCreator.lastname,
-            lastname: newCreator.lastname
+            id: newCreator.creator_id!,
+            name: newCreator.creator_name,
+            lastname: newCreator.creator_lastname
         });
         res.cookie('t', token);
         return Sucess(req, res, newCreator, 200)
@@ -25,22 +25,22 @@ async function httpSignup(req: Request, res: Response) {
     }
 }
 
-async function httpGetProfile(req: Request, res: Response) {
+async function httpGetProfile(req: Request, res: Response): Promise<void> {
     
     try {
         //get the creator information
         const creator: Creator = await getCreator({ id: parseInt(req.params.id) } as CreatorQueryParameters);
         if (!creator) return Error(req, res, 'Creator not found');
         //get the videos created by the creator
-        const videos: Video[] | null = await getAllVideos(
+        const videos: Video[] = await getAllVideos(
             {
                 creator_id: parseInt(req.params.id),
                 limit: req.query.limit?.toString(), //TODO: create default values for this parameter
                 page: req.query.page?.toString() //TODO: create default values for this parameter
             } as VideoQueryParameters
         );
-        //get the liked vides
-        const likedVideos: Video[] | null = await getLikedVideos(
+        //get the liked videos
+        const likedVideos: Video[] = await getLikedVideos(
             {
                 creator_id: parseInt(req.params.id),
                 limit: req.query.limit?.toString(), //TODO: create default values for this parameter

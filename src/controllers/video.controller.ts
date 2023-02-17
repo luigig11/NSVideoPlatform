@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { create, publishVideo, getPublishedVideos, getLikedVideos, getVideo, update } from "../handlers/video.handler";
+import { Video } from "../models/video";
 import { Error, Sucess } from "../network/response";
 
 async function httpCreateVideo(req: Request, res: Response) {
     try {
-        const newVideo = await create(req.body);
+        const newVideo: Video = await create(req.body);
         return Sucess(req, res, newVideo, 200)
     } catch (error) {
         return Error(req, res, error);

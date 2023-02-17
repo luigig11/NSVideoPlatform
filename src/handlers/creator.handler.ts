@@ -29,9 +29,7 @@ async function create(newCreator: Creator): Promise<Creator> {
 
     //validate if the creator already exists in DB
     const existingCreator = await getCreator({email: newCreator.email} as QueryParametrs);
-    if (existingCreator) {
-        throw new Error('already existing creator');
-    }
+    if (existingCreator) throw new Error('already existing creator');
 
     //Begin transaction
     const t = await sequelizeConnection.transaction();
@@ -41,17 +39,17 @@ async function create(newCreator: Creator): Promise<Creator> {
 
         //store the new creator in the DB
         const newUser: DBCreator = await DBCreator.create({
-            creator_name: newCreator.name,
-            creator_lastname: newCreator.lastname,
+            creator_name: newCreator.creator_name,
+            creator_lastname: newCreator.creator_lastname,
             email: newCreator.email,
             pass: hashedPass,
             photo: newCreator.photo,
             rol_id: newCreator.rol_id
         }, {transaction: t});
 
-        console.log('usuario creado: ', newUser.toJSON());
+        console.log('usuario creado: ', newUser.toJSON<Creator>());
         await t.commit();
-        return newUser.toJSON();
+        return newUser.toJSON<Creator>();
 
     } catch (error) {
         await t.rollback();
@@ -63,9 +61,9 @@ async function create(newCreator: Creator): Promise<Creator> {
 async function getCreator(query: QueryParametrs) {
     try {
 
-        let queryParameter = ''
-        let value;
-
+        let queryParameter = query.id ? 'creator_id' : 'email'
+        let value = (queryParameter === 'creator_id') ? query.id : query.email;
+/* 
         if (query.id) {
             queryParameter = 'creator_id';
             value = query.id;
@@ -73,7 +71,7 @@ async function getCreator(query: QueryParametrs) {
         else {
             queryParameter = 'email';
             value = query.email;
-        }
+        } */
 
         let registeredCreator = await DBCreator.findOne({
             where: {

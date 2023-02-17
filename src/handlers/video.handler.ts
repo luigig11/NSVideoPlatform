@@ -20,7 +20,7 @@ function validateRequiredData(req: Request, res: Response, next: NextFunction) {
     next();
 }
 
-async function create(video: Video) {
+async function create(video: Video): Promise<Video> {
 
     const date_created = new Date().toUTCString();
     console.log('date_created', date_created);
@@ -38,7 +38,7 @@ async function create(video: Video) {
 
         console.log('usuario creado: ', newVideo.toJSON());
         await t.commit();
-        return newVideo.toJSON();
+        return newVideo.toJSON<Video>();
 
     } catch (error) {
         await t.rollback();
@@ -63,7 +63,7 @@ async function getVideo(query: QueryParametrs) {
     }
 }
 
-async function getAllVideos(query: QueryParametrs) {
+async function getAllVideos(query: QueryParametrs): Promise<Video[]> {
     //select limit = parameter * from videos where creator_id = <parameter> and creator
     const queryParameter = query.creator_id ? 'creator_id' : 'video_id';
     const value = (queryParameter === 'creator_id') ? query.creator_id : query.video_id;
@@ -71,7 +71,7 @@ async function getAllVideos(query: QueryParametrs) {
     const orderList = query.listOrder || 'DESC';
 
     try {
-        let videos = await DBVideo.findAll({
+        let videos: DBVideo[] = await DBVideo.findAll({
             where: {
                 [queryParameter]: value
             },
@@ -81,10 +81,8 @@ async function getAllVideos(query: QueryParametrs) {
                 [orderItem, orderList]
             ]
         });
-        if (!videos) {
-            return null;
-        }
-        let listVideo: Video[] = videos.map(video => video.toJSON<Video>());
+        if (!videos) return [];
+        const listVideo: Video[] = videos.map(video => video.toJSON<Video>());
         return listVideo;
     } catch (error) {
         console.log('Error while getting videos: ', error);
@@ -119,12 +117,12 @@ async function getPublishedVideos(query: QueryParametrs) {
     }
 }
 
-async function getLikedVideos(query: QueryParametrs) {
+async function getLikedVideos(query: QueryParametrs): Promise<Video[]> {
     const orderItem = query.orderParameter || 'video_id';
     const orderList = query.listOrder || 'DESC';
     try {
         //TODO: MEMOIZE THIS LIST
-        let creator_video = await DBLikeVideo.findAll({
+        let creator_video: DBVideo[] = await DBLikeVideo.findAll({
             where: {
                 creator_id: query.creator_id
             },
@@ -135,13 +133,13 @@ async function getLikedVideos(query: QueryParametrs) {
 
         if (!creator_video) return [];
 
-        let videoId = creator_video.map(video => {
+        let videoId: string[] = creator_video.map(video => {
             return video.getDataValue('video_id');
         });
 
-        let likedvideos = await DBVideo.findAll({
+        let likedvideos: DBVideo[] = await DBVideo.findAll({
             where: {
-                video_id: [...videoId]
+                video_id: videoId
             },
             limit: parseInt(query.limit!),
             offset: parseInt(query.page!),
@@ -152,7 +150,7 @@ async function getLikedVideos(query: QueryParametrs) {
 
         if (!likedvideos) return [];
 
-        let listVideo: Video[] = likedvideos.map(video => video.toJSON());
+        let listVideo: Video[] = likedvideos.map(video => video.toJSON<Video>());
         return listVideo;
     } catch (error) {
         console.log('Error while getting videos: ', error);

@@ -5,11 +5,12 @@ export interface Video {
     description?: string;
     url: string;
     published?: boolean;
-    views?: number;
-    likes?: number;
-    date_created?: string;
+    video_view?: number;
+    video_like?: number;
+    creation_date?: string;
     date_published?: string;
     creator_id: number;
+    is_deleted: boolean;
 }
 
 export interface QueryParametrs {
