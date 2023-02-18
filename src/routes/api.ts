@@ -10,7 +10,8 @@ const api = Router();
 api.use('/auth', authRouter);
 api.use('/creator', creatorRouter);
 api.use('/video', videoRouter);
-api.use('/like', likevideoRouter)
+api.use('/like', likevideoRouter);
+api.use('/follower', likevideoRouter);
 
 export {
     api

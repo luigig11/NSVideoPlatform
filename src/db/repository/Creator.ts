@@ -34,7 +34,8 @@ Creator.init({
     },
     followers: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: true,
+        defaultValue: 0
     }
 
 }, {

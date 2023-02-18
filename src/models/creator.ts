@@ -14,6 +14,7 @@ export interface Creator {
 export interface QueryParametrs {
     id?: number;
     email?: string;
+    is_following?: boolean;
     page?: string;
     limit?: string;
     orderParameter?: string;

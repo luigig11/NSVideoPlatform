@@ -109,11 +109,34 @@ async function update(query: Creator): Promise<Array<number>> {
     }
 }
 
+async function updateAmountFollowers(query: QueryParametrs): Promise<void> {
+    const creator = await getCreator({id: query.id});
+    if (!creator) throw new Error('Could not find creator');
+    const newFollowers = query.is_following ? creator.followers! + 1 : creator.followers! - 1;
+    const t = await sequelizeConnection.transaction();
+    try {
+        await DBCreator.update({
+            followers: newFollowers
+        }, {
+            where: {
+                creator_id: query.id
+            },
+            transaction: t
+        });
+        await t.commit();
+    } catch (error) {
+        await t.rollback();
+        console.log('Error while adding follower: ', error);
+        throw new Error('followers were not updated');
+    }
+}
+
 //#endregion
 
 export {
     create,
     validateRequiredData,
     getCreator,
-    update
+    update,
+    updateAmountFollowers
 }

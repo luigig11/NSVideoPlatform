@@ -11,6 +11,7 @@ import './db/repository/Rol';
 import './db/repository/Creator';
 import './db/repository/Video';
 import './db/repository/LikeVideo';
+import './db/repository/Follower';
 
 const isDevEnv = process.env.NODE_ENV === 'development';
 
@@ -20,7 +21,7 @@ const server = createServer(app);
 
 async function startServer(): Promise<void> {
     try {
-        // await sequelizeConnection.sync({alter: isDevEnv});
+        await sequelizeConnection.sync({alter: isDevEnv});
         console.log('Connection has been established successfully.');
         server.listen(PORT, () => {
             console.log('Project int in port ', PORT);
