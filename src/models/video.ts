@@ -18,9 +18,11 @@ export interface QueryParametrs {
     creator_id?: number;
     title?: string;
     published?: boolean;
+    is_liked?: boolean;
+    video_like?: number;
     page?: string;
     limit?: string;
     orderParameter?: string;
     listOrder?: string;
-    is_liked?: boolean;
+    
 }

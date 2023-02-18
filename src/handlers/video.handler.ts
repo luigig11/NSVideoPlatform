@@ -171,7 +171,8 @@ async function publishVideo(query:QueryParametrs): Promise<Array<number>> {
         }, {
             where: {
                 video_id: query.video_id
-            }
+            },
+            transaction: t
         })
         await t.commit();
         return updatedVideo;
@@ -194,14 +195,38 @@ async function update(query: Video): Promise<Array<number>> {
         }, {
             where: {
                 video_id: query.video_id
-            }
-        })
+            },
+            transaction: t
+        });
         await t.commit();
         return updatedVideo;
     } catch (error) {
         await t.rollback();
         console.log('transaccion error: ', error);
         throw new Error('The video was not updated');
+    }
+}
+
+async function updateLikes(query: QueryParametrs): Promise<void> {
+    const video = await getVideo({video_id: query.video_id});
+    if (!video) throw new Error('Could not find video');
+    // const newlikes: number = video.video_like! + 1;
+    const newLikes = query.is_liked ? video.video_like! + 1 : video.video_like! - 1;
+    const t = await sequelizeConnection.transaction();
+    try {
+        await DBVideo.update({
+            video_like: newLikes
+        }, {
+            where: {
+                video_id: query.video_id
+            },
+            transaction: t
+        });
+        await t.commit();
+    } catch (error) {
+        await t.rollback();
+        console.log('Error while adding like: ', error);
+        throw new Error('video likes were not updated');
     }
 }
 
@@ -215,5 +240,6 @@ export {
     create,
     validateRequiredData,
     publishVideo,
-    update
+    update,
+    updateLikes,
 }

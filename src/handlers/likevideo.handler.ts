@@ -1,6 +1,7 @@
 import { sequelizeConnection } from "../db/config";
 import DBLikeVideo from "../db/repository/LikeVideo";
 import { LikeVideo, QueryParametrs } from "../models/likevideo";
+import { updateLikes } from "./video.handler";
 
 //#region Select methods
 async function getAllLikeVideo(query: QueryParametrs): Promise<DBLikeVideo[]> {
@@ -45,20 +46,19 @@ async function getLike(query : QueryParametrs): Promise<LikeVideo | null> {
 
 //#region Insert methods
 async function addLikeVideo(query: QueryParametrs): Promise<LikeVideo | number[]> {
-    const {video_id, creator_id} = query;
-    const like: LikeVideo | null = await getLike({video_id, creator_id});
-    if (like) {
-        like.is_liked = query.is_liked;
-        return await updateLikeVideo(like);
-    }
+
     const t = await sequelizeConnection.transaction();
     try {
+        
         const newLike: DBLikeVideo = await DBLikeVideo.create({
             creator_id: query.creator_id,
             video_id: query.video_id
         }, {transaction: t});
+        await updateLikes({
+            video_id: query.video_id,
+            is_liked: true
+        });
         await t.commit();
-        //TODO: INVOKE INCREASELIKES();
         return newLike.toJSON<LikeVideo>();
     } catch (error) {
         if(t) await t.rollback();
@@ -76,9 +76,12 @@ async function updateLikeVideo(query: LikeVideo): Promise<number[]> {
         }, {
             where: {
                 like_video_id: query.like_video_id
-            }
-        }) ;
-        //TODO: INVOKE INCREASELIKES();
+            },
+        });
+        await updateLikes({
+            video_id: query.video_id,
+            is_liked: query.is_liked
+        });
         await t.commit();
         return like;
     } catch (error) {
@@ -91,5 +94,7 @@ async function updateLikeVideo(query: LikeVideo): Promise<number[]> {
 
 export {
     getAllLikeVideo,
-    addLikeVideo
+    addLikeVideo,
+    updateLikeVideo,
+    getLike
 }

@@ -29,11 +29,13 @@ Video.init({
     },
     video_view: {
         type: DataTypes.BIGINT,
-        allowNull: true
+        allowNull: true,
+        defaultValue: 0
     },
     video_like: {
         type: DataTypes.BIGINT,
-        allowNull: true
+        allowNull: true,
+        defaultValue: 0
     },
     date_published: {
         type: DataTypes.STRING,
