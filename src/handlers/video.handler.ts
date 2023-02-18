@@ -5,6 +5,8 @@ import DBVideo from '../db/repository/Video';
 import { QueryParametrs, Video } from "../models/video";
 import { NextFunction, Request, Response } from 'express';
 import { Error as NetworkError } from '../network/response';
+import { getAllLikeVideo } from './likevideo.handler';
+import { LikeVideo } from '../models/likevideo';
 
 
 function validateRequiredData(req: Request, res: Response, next: NextFunction) {
@@ -89,15 +91,14 @@ async function getPublishedVideos(query: QueryParametrs): Promise<Video[]> {
 async function getLikedVideos(query: QueryParametrs): Promise<Video[]> {
     const orderItem = query.orderParameter || 'video_id';
     const orderList = query.listOrder || 'DESC';
+    console.log(query);
     try {
         //TODO: MEMOIZE THIS LIST
-        let creator_video: DBVideo[] = await DBLikeVideo.findAll({
-            where: {
-                creator_id: query.creator_id
-            },
-            order: [
-                [orderItem, orderList]
-            ]
+        let creator_video: DBLikeVideo[] = await getAllLikeVideo({
+            creator_id: query.creator_id!,
+            is_liked: query.is_liked,
+            orderParameter: query.orderParameter,
+            listOrder: query.listOrder
         });
 
         if (!creator_video) return [];

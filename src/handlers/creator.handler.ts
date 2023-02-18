@@ -84,8 +84,36 @@ async function create(newCreator: Creator): Promise<Creator> {
 
 //#endregion
 
+//#region Put methods
+
+async function update(query: Creator): Promise<Array<number>> {
+    const creator: Creator | null = await getCreator(query);
+    if (!creator) throw new Error('creator not founded');
+    const t = await sequelizeConnection.transaction();
+    try {        
+        const updateCreator: Array<number> = await DBCreator.update({
+            creator_name: query.creator_name,
+            creator_lastname: query.creator_lastname,
+            photo: query.photo,
+        }, {
+            where: {
+                creator_id: query.creator_id
+            }
+        });
+        await t.commit();
+        return updateCreator;
+    } catch (error) {
+        await t.rollback();
+        console.log('transaccion error: ', error);
+        throw new Error('The creator was not updated');
+    }
+}
+
+//#endregion
+
 export {
     create,
     validateRequiredData,
-    getCreator
+    getCreator,
+    update
 }

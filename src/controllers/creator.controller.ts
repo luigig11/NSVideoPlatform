@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { query, Request, Response } from 'express';
 /* import DBCreator from '../db/repository/Creator';
 
 import { Creator } from '../models/creator';
 import { sequelizeConnection } from '../db/config'; */
 import { Error, Sucess } from '../network/response';
-import { create, getCreator } from '../handlers/creator.handler';
+import { create, getCreator, update } from '../handlers/creator.handler';
 import { createtoken } from '../handlers/auth.handler';
 import { Creator, QueryParametrs as CreatorQueryParameters, Profile } from '../models/creator';
 import { Video, QueryParametrs as VideoQueryParameters } from '../models/video';
@@ -12,7 +12,7 @@ import { getAllVideos, getLikedVideos } from '../handlers/video.handler';
 
 //#region Get methods
 async function httpGetProfile(req: Request, res: Response): Promise<void> {
-    
+
     try {
         //get the creator information
         const creator: Creator | null = await getCreator({ id: parseInt(req.params.id) } as CreatorQueryParameters);
@@ -30,7 +30,8 @@ async function httpGetProfile(req: Request, res: Response): Promise<void> {
             {
                 creator_id: parseInt(req.params.id),
                 limit: req.query.limit?.toString(), //TODO: create default values for this parameter
-                page: req.query.page?.toString()//TODO: create default values for this parameter
+                page: req.query.page?.toString(),//TODO: create default values for this parameter
+                is_liked: req.query.is_liked
             } as VideoQueryParameters
         );
 
@@ -70,8 +71,13 @@ async function httpSignup(req: Request, res: Response): Promise<void> {
 //#endregion
 
 //#region Put methods
-function editProfile() {
-
+async function httpEditProfile(req: Request, res: Response): Promise<void> {
+    try {
+        const editedCreator: number[] = await update(req.body);
+        return Sucess(req, res, `${editedCreator.length} creators updated`, 200);
+    } catch (error) {
+        return Error(req, res, error);
+    }
 }
 
 function followCreator() {
@@ -81,25 +87,18 @@ function followCreator() {
 function unFollowCreator() {
 
 }
+
+//#endregion
+
+//#region Delete methods
 //#endregion
 
 
 
-
-function addLike() {
-
-}
-
-function removeLike() {
-
-}
-
 export {
     httpSignup,
     httpGetProfile,
-    editProfile,
+    httpEditProfile,
     followCreator,
     unFollowCreator,
-    addLike,
-    removeLike
 }

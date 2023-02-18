@@ -16,6 +16,8 @@ export interface QueryParametrs {
     email?: string;
     page?: string;
     limit?: string;
+    orderParameter?: string;
+    listOrder?: string;
 }
 
 export interface Profile {

@@ -22,4 +22,5 @@ export interface QueryParametrs {
     limit?: string;
     orderParameter?: string;
     listOrder?: string;
+    is_liked?: boolean;
 }
