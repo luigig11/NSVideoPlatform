@@ -1,8 +1,4 @@
 import { query, Request, Response } from 'express';
-/* import DBCreator from '../db/repository/Creator';
-
-import { Creator } from '../models/creator';
-import { sequelizeConnection } from '../db/config'; */
 import { Error, Sucess } from '../network/response';
 import { create, getCreator, update } from '../handlers/creator.handler';
 import { createtoken } from '../handlers/auth.handler';
@@ -80,14 +76,6 @@ async function httpEditProfile(req: Request, res: Response): Promise<void> {
     }
 }
 
-function followCreator() {
-
-}
-
-function unFollowCreator() {
-
-}
-
 //#endregion
 
 //#region Delete methods
@@ -99,6 +87,4 @@ export {
     httpSignup,
     httpGetProfile,
     httpEditProfile,
-    followCreator,
-    unFollowCreator,
 }

@@ -61,22 +61,10 @@ const requireSignin = expressjwt({
     algorithms: ['RS256', 'HS256']
 });
 
-function hasAuthorization(req: any, res: Response, next: NextFunction) {
-    const authorized = req.profile && req.auth && req.profile._id == req.auth._id; //Aquí se hace solo la comparacion por valor porque req.profile._id y req.auth._id no son del mismo tipo
-    console.log(req.profile)
-    console.log(req.auth)
-    console.log(req.profile._id)
-    console.log(req.auth._id)
-    if (!(authorized)) {
-        return NetworkError(req, res, 'User is not authorized', 'User is not authorized', '403')
-    }
-    next();
-}
 
 export {
     signIn,
     validateRequiredData,
     createtoken,
     requireSignin,
-    hasAuthorization
 }
